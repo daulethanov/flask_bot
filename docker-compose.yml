@@ -1,0 +1,57 @@
+
+services:
+  flask:
+    build: .
+    ports:
+      - "5000:5000"
+    depends_on:
+      - database
+
+  database:
+    image: postgres:13.6
+
+    environment:
+      - POSTGRES_DB=dbname
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=1234
+    ports:
+      - "5432:5432"
+
+  bot:
+    build: .
+    entrypoint: python bot.py
+    environment:
+      - SQLALCHEMY_DATABASE_URI=postgresql://postgres:1234@database:5432/dbname
+    env_file:
+      - .env
+    depends_on:
+      - database
+      - flask
+
+
+  worker:
+    build: .
+    hostname: worker
+    command: celery -A celery_app worker --loglevel=info
+#    command: celery -A celery_app purge
+    depends_on:
+      - redis
+    env_file:
+      - .env
+
+  redis:
+    image: redis
+    hostname: redis
+    ports:
+      - "6379:6379"
+
+  flower:
+    build: .
+    hostname: flower
+    command: celery -A celery_app flower
+
+    depends_on:
+      - redis
+      - worker
+    ports:
+      - "5555:5555"

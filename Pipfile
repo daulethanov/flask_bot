@@ -1,0 +1,36 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+flask = "*"
+flask-sqlalchemy = "*"
+psycopg2-binary = "2.9.1"
+python-dotenv = "*"
+flask-env = "*"
+flask-security = "*"
+pytz = "*"
+email-validator = "*"
+flask-migrate = "*"
+flask-jwt-extended = "*"
+flask-marshmallow = "*"
+marshmallow-sqlalchemy = "*"
+flask-admin = "*"
+pandas = "*"
+requests = "*"
+marshmallow = "*"
+python-telegram-bot = "*"
+pytelegrambotapi = "*"
+chardet = "*"
+schedule = "*"
+flask-wtf = "*"
+celery = "==4.4.7"
+redis = "*"
+flower = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.9"
+python_full_version = "3.9.6"

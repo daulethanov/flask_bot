@@ -1,0 +1,40 @@
+{% extends 'admin/model/list.html' %}
+
+{% block table_actions %}
+    {{ super() }}
+    <a href="{{ url_for('.action_send_message', ids=list_view.selected_ids) }}" class="btn btn-warning" role="button">Send Selected Messages</a>
+{% endblock %}
+
+{% block list_table %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                {% if list_view.can_delete %}
+                    <th class="checkbox-column">
+                        <input type="checkbox" id="select-all" data-url="{{ url_for('.action_send_message', ids=list_view.selected_ids) }}">
+                    </th>
+                {% endif %}
+                {% for c in list_view._list_columns %}
+                    <th>{{ c.label }}</th>
+                {% endfor %}
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in list_view.data %}
+                <tr>
+                    {% if list_view.can_delete %}
+                        <td class="checkbox-column"><input type="checkbox" name="rowid" value="{{ row[0] }}"></td>
+                    {% endif %}
+                    {% for column, value in row.items() %}
+                        <td>{{ value }}</td>
+                    {% endfor %}
+                    <td>
+                        <a href="{{ url_for('telegrammessage.edit_view', id=row[0]) }}" class="btn btn-info" role="button">Edit</a>
+                        <a href="{{ url_for('.action_send_message', ids=[row[0]]) }}" class="btn btn-warning" role="button">Send Message</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

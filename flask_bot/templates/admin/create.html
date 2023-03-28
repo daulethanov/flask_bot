@@ -1,0 +1,6 @@
+{% extends 'admin/model/create.html' %}
+
+{% block form %}
+    {{ super() }}
+    <a href="{{ url_for('.action_send_message', ids=[form.id.data]) }}" class="btn btn-warning" role="button">Send Message</a>
+{% endblock %}
