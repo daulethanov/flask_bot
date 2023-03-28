@@ -1,17 +1,14 @@
-import os
 from datetime import datetime, timedelta
+import celery_app
 import pytz
 from flask import flash
 from flask_admin.actions import action
 from flask_admin import Admin
 from flask_login import current_user
 from sqlalchemy import func
-from celery_app import send_message, send_message_to_users
 from . import MyModelView, MyModelViewTicket
-from ..model.user import User, Role
-from ..model.ticket import Ticket, UserMessage
-from ..model import db
-
+from flask_bot.model.user import User, Role
+from flask_bot.model.ticket import Ticket, db, UserMessage
 admin = Admin()
 
 
@@ -45,6 +42,7 @@ class MyTicket(MyModelViewTicket):
 
 
 class TelegramMessage(MyModelView):
+
     column_list = [
         'user_id',
         'title',
@@ -57,7 +55,7 @@ class TelegramMessage(MyModelView):
 
     @action('Запустить рассылку', 'Запустить рассылку', 'Вы уверены, что хотите отправить выбранные сообщения?')
     def action_send_message(self, ids):
-        from flask_bot.model.ticket import Ticket, db
+
         try:
             local_tz = pytz.timezone('Asia/Almaty')
             messages = Ticket.query.filter(Ticket.id.in_(ids)).all()
@@ -66,9 +64,9 @@ class TelegramMessage(MyModelView):
                 now = datetime.now(tz=local_tz) + timedelta(hours=6)
                 if send_at >= now:
                     delay = (send_at - now).total_seconds()
-                    send_message.apply_async(args=[message.title, message.user_id], countdown=delay)
+                    celery_app.send_message_to.apply_async(args=[message.title, message.user_id], countdown=delay)
                 else:
-                    send_message.apply_async(args=[message.title, message.user_id])
+                    celery_app.send_message_to.apply_async(args=[message.title, message.user_id])
 
             flash('Отправлено', 'success')
         except Exception as ex:
@@ -80,6 +78,7 @@ class TelegramMessageView(MyModelView):
 
     @action('Запустить рассылку', 'Запустить рассылку', 'Вы уверены, что хотите отправить выбранные сообщения?')
     def action_sends_messages(self, ids):
+
         try:
             local_tz = pytz.timezone('Asia/Almaty')
             messages = UserMessage.query.filter(UserMessage.id.in_(ids)).all()
@@ -90,10 +89,10 @@ class TelegramMessageView(MyModelView):
                     now = datetime.now(tz=local_tz) + timedelta(hours=6)
                     if send_at >= now:
                         delay = (send_at - now).total_seconds()
-                        send_message_to_users.apply_async(args=[message.text, user.token], countdown=delay)
+                        celery_app.send_message_to_users.apply_async(args=[message.text, user.token], countdown=delay)
 
                     else:
-                        send_message_to_users.apply_async(args=[message.text, user.token])
+                        celery_app.send_message_to_users.apply_async(args=[message.text, user.token])
             flash('Отправлено', 'success')
         except Exception as ex:
             flash(str(ex), 'error')

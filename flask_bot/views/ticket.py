@@ -7,7 +7,6 @@ from ..model.ticket import Ticket
 from ..model.user import User
 from ..sh.ticket import TicketSchema
 from ..sh.user import UserSchema
-from bot import bot
 
 
 ticket = Blueprint('tickets', __name__, url_prefix='/api/ticket')
@@ -62,15 +61,9 @@ def send_message():
         for user in users:
             if current_time == user_data['notification_time']:
                 message = "Время оповещения наступило!"
-                bot.send_message(user.token, message)
-
                 user.notification_time = None
                 db.session.commit()
 
 
-@ticket.route('/time_message', methods=['POST'])
-def timeout_message():
 
-    while True:
-        pass
 

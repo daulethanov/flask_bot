@@ -19,7 +19,7 @@ services:
 
   bot:
     build: .
-    entrypoint: python bot.py
+    entrypoint: python bots.py
     environment:
       - SQLALCHEMY_DATABASE_URI=postgresql://postgres:1234@database:5432/dbname
     env_file:

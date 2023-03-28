@@ -3,6 +3,9 @@ from datetime import datetime, timedelta
 import telebot
 from telebot import types
 import logging
+from flask_bot.model.ticket import Ticket, db
+from flask_bot.model.user import User
+
 
 token = os.environ.get('BOT_ID')
 bot = telebot.TeleBot(token=token)
@@ -12,7 +15,6 @@ logging.basicConfig(level=logging.DEBUG)
 
 @bot.message_handler(commands=['start'])
 def start(message):
-    from flask_bot.model.user import User
     user_id = message.chat.id
     from app import app
     with app.app_context():
@@ -33,7 +35,6 @@ def start_ticket(message):
 
     if message.text == 'Завершить':
         from app import app
-        from flask_bot.model.ticket import Ticket, db
         markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
         btn1 = types.KeyboardButton('Ждать следующие задание')
         markup.add(btn1)
@@ -44,6 +45,7 @@ def start_ticket(message):
             ticket.status = True
             db.session.commit()
         bot.send_message(chat_id=ticket_id, text='Тикет отправлен', reply_markup=markup)
+
 
 
 if __name__ == '__main__':
