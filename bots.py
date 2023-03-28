@@ -47,6 +47,5 @@ def start_ticket(message):
         bot.send_message(chat_id=ticket_id, text='Тикет отправлен', reply_markup=markup)
 
 
-
 if __name__ == '__main__':
     bot.polling()
