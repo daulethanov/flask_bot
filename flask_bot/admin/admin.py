@@ -64,9 +64,9 @@ class TelegramMessage(MyModelView):
                 now = datetime.now(tz=local_tz) + timedelta(hours=6)
                 if send_at >= now:
                     delay = (send_at - now).total_seconds()
-                    celery_app.send_message_to.apply_async(args=[message.title, message.user_id], countdown=delay)
+                    celery_app.send_message.apply_async(args=[message.title, message.user_id], countdown=delay)
                 else:
-                    celery_app.send_message_to.apply_async(args=[message.title, message.user_id])
+                    celery_app.send_message.apply_async(args=[message.title, message.user_id])
 
             flash('Отправлено', 'success')
         except Exception as ex:

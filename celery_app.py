@@ -7,7 +7,7 @@ celery.conf['CELERY_TIMEZONE'] = 'Asia/Almaty'
 
 @celery.task()
 @bot.message_handler(content_types=['text'])
-def send_message_to(title, user_id):
+def send_message(title, user_id):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton('Начать')
     markup.add(btn1)

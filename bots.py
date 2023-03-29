@@ -4,8 +4,7 @@ import telebot
 from telebot import types
 import logging
 from flask_bot.model.ticket import Ticket, db
-from flask_bot.model.user import User
-
+from flask_bot.model.user import User, Role
 
 token = os.environ.get('BOT_ID')
 bot = telebot.TeleBot(token=token)
@@ -13,7 +12,7 @@ bot = telebot.TeleBot(token=token)
 logging.basicConfig(level=logging.DEBUG)
 
 
-@bot.message_handler(commands=['start'])
+@bot.message_handler(commands=['start', 'help'], content_types=['text'])
 def start(message):
     user_id = message.chat.id
     from app import app
@@ -23,6 +22,24 @@ def start(message):
             bot.send_message(message.chat.id, 'Вы авторизированный пользователь')
         else:
             bot.send_message(message.chat.id, 'Доступ запрещен')
+
+
+@bot.message_handler(commands=['message'])
+def message_upload(message):
+    from app import app
+    with app.app_context():
+        user = User.query.filter(Role.name == 'admin')
+        if user:
+            markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+            markups = []
+            for btn in markups:
+                user_token = User.query.filter(Role.name == 'developer').all()
+                markups.append(btn)
+                markup.add(markups)
+                bot.send_message(message.chat.id, text='Выберите пользователей', reply_markup=markup)
+        else:
+            bot.send_message(message.chat.id, text='У вас нету прав')
+    # bot.send_message(message.chat.id, text='dds')
 
 
 @bot.message_handler(content_types=['text'])
